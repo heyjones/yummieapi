@@ -8,26 +8,6 @@ var mandrill_client = new mandrill.Mandrill('OUkg9XvLhLHqv9M51lOrAA');
 
 app.get('/', function(req, res){
 	res.send('yummieapi');
-	var message = {
-		"from_email": "mandrill@heyjones.com",
-		"from_name": "Mandrill",
-		"headers": {
-			"Reply-To": "mandrill@heyjones.com"
-		},
-		"to": [{
-			"email": "chris@heyjones.com",
-			"name": "Chris Jones",
-			"type": "to"
-		}],
-		"html": "<p>This is a test email from Mandrill</p>",
-		"text": "This is a test email from Mandrill",
-		"subject": "Test"
-	};
-	mandrill_client.messages.send({"message": message}, function(result){
-		console.log(result);
-	}, function(e){
-		console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-	});
 });
 
 app.get('/shopify/orders.json', function(req, res){
@@ -120,6 +100,28 @@ app.get('/yummie/order/new', function(req, res){
 	req.on('error', function(e){
 		console.log(e)
 	});
+
+	var message = {
+		"from_email": "mandrill@heyjones.com",
+		"from_name": "Mandrill",
+		"headers": {
+			"Reply-To": "mandrill@heyjones.com"
+		},
+		"to": [{
+			"email": "chris@heyjones.com",
+			"name": "Chris Jones",
+			"type": "to"
+		}],
+		"subject": "Order # " + data,
+		"html": "<p>This is a test email from Mandrill</p>",
+		"text": "This is a test email from Mandrill"
+	};
+	mandrill_client.messages.send({"message": message}, function(result){
+		console.log(result);
+	}, function(e){
+		console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+	});
+
 	req.write(data);
 	req.end();
 	
