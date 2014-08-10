@@ -5,7 +5,7 @@ var shopifyAPI = require('shopify-node-api');
 var soap = require('soap');
 
 app.get('/', function(req, res){
-	res.send('');
+	res.send('yummieapi');
 });
 
 app.get('/shopify/orders.json', function(req, res){
