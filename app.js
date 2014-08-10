@@ -58,21 +58,21 @@ app.get('/yummie/order/new', function(req, res){
 	Products.push(obj);
 
 	var person = new Object();
-	person.firstName = "test";
-	person.lastName = "test";
-	person.address = "xyz";
-	person.postcode = "1234";
-	person.suburb = "xyz";
-	person.state = "xyz";
-	person.email = "testJS@xyz.com";
-	person.phone = "123456";
-	person.optInMailingList = true;
-	person.countryCodeISO3166_A2 = "AU";
+	person.firstName = "Jones";
+	person.lastName = "Chris";
+	person.address = "321 N Wayne Ave";
+	person.postcode = "92833";
+	person.suburb = "Fullerton";
+	person.state = "CA";
+	person.email = "chris@seedcms.com";
+	person.phone = "0019494131049";
+	person.optInMailingList = false;
+	person.countryCodeISO3166_A2 = "US";
 
 	var Order = new Object();
 	Order.products = Products;
 	Order.person = person;
-	Order.refNo = "TESTJS";
+	Order.refNo = "seedcms";
 
 	var data = JSON.stringify({order: Order});
 	var orderid = 0;
@@ -112,7 +112,7 @@ app.get('/yummie/order/new', function(req, res){
 			"name": "Chris Jones",
 			"type": "to"
 		}],
-		"subject": "Order # " + data,
+		"subject": "Order # " + orderid,
 		"html": "<p>This is a test email from Mandrill</p>",
 		"text": "This is a test email from Mandrill"
 	};
