@@ -3,9 +3,30 @@ var app = express();
 var http = require('http');
 var shopifyAPI = require('shopify-node-api');
 var soap = require('soap');
+var nodemailer = require('nodemailer');
+var transporter = nodemailer.createTransport("SMTP", {
+	service: "Mandrill",
+	auth:{
+		user: "chris@heyjones.com",
+		pass: "OUkg9XvLhLHqv9M51lOrAA"
+	}
+});
 
 app.get('/', function(req, res){
 	res.send('yummieapi');
+	smtpTransport.sendMail({
+		from: "mandrill@heyjones.com",
+		to: "chris@heyjones.com",
+		subject: "Test",
+		html: "This is from node.js"
+	}, function(error, response){
+		if(error){
+			console.log(error);
+			callback(error, response);
+		}else{
+			callback(null, response);
+		}
+	});
 });
 
 app.get('/shopify/orders.json', function(req, res){
