@@ -1,0 +1,17 @@
+{
+	"name": "yummieapi",
+	"version": "0.0.0",
+	"description": "YummieAPI",
+	"main": "app.js",
+	"dependencies": {
+		"express": "3.x"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/heyjones/yummieapi.git"
+	},
+	"engines": {
+		"node": "0.10.x",
+		"npm": "1.2.x"
+    }
+}
