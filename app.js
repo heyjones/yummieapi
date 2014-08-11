@@ -10,7 +10,7 @@ app.get('/', function(req, res){
 	res.send('yummieapi');
 });
 
-app.get('/shopify/order/new', function(req, res){
+app.post('/shopify/order/new', function(req, res){
 /* console.log(req); */
 	var message = {
 		"from_email": "mandrill@heyjones.com",
