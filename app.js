@@ -44,14 +44,18 @@ app.get('/yummie/styles.json', function(req, res){
 });
 
 app.get('/yummie/login', function(req, res){
+
 	var login = new Object();
 	login.userName = 'staff';
 	login.password = 'staff';
+
 	var data = JSON.stringify(login);
+
 	var headers = {
 		'Content-Type': 'application/json',
 		'Content-Length': data.length
 	};
+
 	var options = {
 		host: 'dev8.nicheweb.com.au',
 		port: 80,
@@ -59,21 +63,24 @@ app.get('/yummie/login', function(req, res){
 		method: 'POST',
 		headers: headers
 	};
+
 	var req = http.request(options, function(r){
-console.log(r);
 		r.setEncoding('utf-8');
 		r.on('data', function(data){
 console.log(data);
 		});
 		r.on('end', function(){
-			res.send('YAY!');
 		});
 	});
 	req.on('error', function(e){
 		console.log(e)
 	});
-	req.write('YAY!');
+	req.write(data);
 	req.end();
+
+	res.send(data);
+	res.end();
+
 });
 
 app.get('/yummie/order/new', function(req, res){
