@@ -26,15 +26,15 @@ console.log(req.body);
 			"type": "to"
 		}],
 		"subject": "New Order",
-		"html": req.body,
-		"text": req.body
+		"html": JSON.stringify(req.body),
+		"text": JSON.stringify(req.body)
 	};
 	mandrill_client.messages.send({"message": message}, function(result){
 /* 		console.log(result); */
 	}, function(e){
 		console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
 	});
-	res.send(req);
+	res.send(JSON.stringify(req.body));
 });
 
 app.get('/shopify/orders.json', function(req, res){
