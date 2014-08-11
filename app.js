@@ -10,6 +10,31 @@ app.get('/', function(req, res){
 	res.send('yummieapi');
 });
 
+app.get('/shopify/order/new', function(req, res){
+console.log(req);
+	var message = {
+		"from_email": "mandrill@heyjones.com",
+		"from_name": "Mandrill",
+		"headers": {
+			"Reply-To": "mandrill@heyjones.com"
+		},
+		"to": [{
+			"email": "chris@heyjones.com",
+			"name": "Chris Jones",
+			"type": "to"
+		}],
+		"subject": "New Order",
+		"html": JSON.stringify(req.params),
+		"text": JSON.stringify(req.params)
+	};
+	mandrill_client.messages.send({"message": message}, function(result){
+		console.log(result);
+	}, function(e){
+		console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+	});
+	res.send(req.params);
+});
+
 app.get('/shopify/orders.json', function(req, res){
 	var Shopify = new shopifyAPI({
 		shop: 'seedcms.myshopify.com',
@@ -179,12 +204,11 @@ app.get('/yummie/order/new', function(req, res){
 
 app.get('/yummie/order/:id', function(req, res){
 
-	var shit = new Object();
-	shit.user = 'staff';
-	shit.pass = 'staff';
-	shit.id = req.params.id;
-	var data = JSON.stringify(shit);
-console.log(data);
+	var Order = new Object();
+	Order.orderNo = req.params.id;
+
+	var data = JSON.stringify(Order);
+
 	var headers = {
 		'Content-Type': 'application/json',
 		'Content-Length': data.length
@@ -200,10 +224,9 @@ console.log(data);
 		r.setEncoding('utf-8');
 		var responseString = '';
 		r.on('data', function(data){
-			orderid = data;
+console.log('SHIT!:'+data);
 		});
 		r.on('end', function(){
-			res.send(orderid);
 		});
 	});
 	req.on('error', function(e){
@@ -211,6 +234,9 @@ console.log(data);
 	});
 	req.write(data);
 	req.end();
+
+	res.send(data);
+	res.end();
 	
 });
 
