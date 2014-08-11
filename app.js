@@ -24,8 +24,8 @@ console.log(req);
 			"type": "to"
 		}],
 		"subject": "New Order",
-		"html": JSON.stringify(req.params),
-		"text": JSON.stringify(req.params)
+		"html": req.params,
+		"text": req.params
 	};
 	mandrill_client.messages.send({"message": message}, function(result){
 		console.log(result);
