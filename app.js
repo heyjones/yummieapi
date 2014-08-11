@@ -1,4 +1,5 @@
 var express = require('express');
+var bodyParser = require('body-parser')
 var app = express();
 var http = require('http');
 var shopifyAPI = require('shopify-node-api');
@@ -6,7 +7,7 @@ var soap = require('soap');
 var mandrill = require('mandrill-api/mandrill');
 var mandrill_client = new mandrill.Mandrill('OUkg9XvLhLHqv9M51lOrAA');
 
-app.use(express.bodyParser());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/', function(req, res){
 	res.send('yummieapi');
@@ -15,21 +16,21 @@ app.get('/', function(req, res){
 app.post('/shopify/order/new', function(req, res){
 console.log(req.body);
 	var message = {
-		"from_email": "mandrill@heyjones.com",
-		"from_name": "Mandrill",
-		"headers": {
-			"Reply-To": "mandrill@heyjones.com"
+		'from_email': 'mandrill@heyjones.com',
+		'from_name': 'Mandrill',
+		'headers': {
+			'Reply-To': 'mandrill@heyjones.com'
 		},
-		"to": [{
-			"email": "chris@heyjones.com",
-			"name": "Chris Jones",
-			"type": "to"
+		'to': [{
+			'email': 'chris@heyjones.com',
+			'name': 'Chris Jones',
+			'type': 'to'
 		}],
-		"subject": "New Order",
-		"html": JSON.stringify(req.body),
-		"text": JSON.stringify(req.body)
+		'subject': 'New Order',
+		'html': JSON.stringify(req.body),
+		'text': JSON.stringify(req.body)
 	};
-	mandrill_client.messages.send({"message": message}, function(result){
+	mandrill_client.messages.send({'message': message}, function(result){
 /* 		console.log(result); */
 	}, function(e){
 		console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
@@ -48,6 +49,27 @@ app.get('/shopify/orders.json', function(req, res){
 	Shopify.get('/admin/orders.json', {status: 'open'}, function(err, data, headers){
 		res.send(data.orders);
 	});
+});
+
+app.get('/shopify/order/:id/fulfillment/new', function(req, res){
+	var id = req.params.id;
+	var post_data = {
+		'fulfillment': {
+			'tracking_number': '123456789',
+			'notify_customer': false
+		}
+	}
+	var Shopify = new shopifyAPI({
+		shop: 'seedcms.myshopify.com',
+		shopify_api_key: '89fa1ac4b082c6877427bd553b4f64a1',
+		shopify_shared_secret: 'efced55c08389299d01b9fba89e6f303',
+		access_token: 'f4eaa7a2a3da1a3c6d5d808b3737d0b1',
+		verbose: false
+	});
+	Shopify.post('/admin/orders/'+id+'/fulfillments.json', post_data, function(err, data, headers){
+console.log(data);
+	});
+	res.send('done');
 });
 
 app.get('/yummie/styles.json', function(req, res){
