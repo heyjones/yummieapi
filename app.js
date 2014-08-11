@@ -6,13 +6,14 @@ var soap = require('soap');
 var mandrill = require('mandrill-api/mandrill');
 var mandrill_client = new mandrill.Mandrill('OUkg9XvLhLHqv9M51lOrAA');
 
+app.use(express.bodyParser());
+
 app.get('/', function(req, res){
 	res.send('yummieapi');
 });
 
 app.post('/shopify/order/new', function(req, res){
-var yadda = '';
-console.log(req);
+console.log(req.body);
 	var message = {
 		"from_email": "mandrill@heyjones.com",
 		"from_name": "Mandrill",
@@ -29,12 +30,11 @@ console.log(req);
 		"text": req.body
 	};
 	mandrill_client.messages.send({"message": message}, function(result){
-		yadda = result;
-		console.log(result);
+/* 		console.log(result); */
 	}, function(e){
 		console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
 	});
-	res.send(req.body);
+	res.send(req);
 });
 
 app.get('/shopify/orders.json', function(req, res){
