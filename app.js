@@ -7,7 +7,7 @@ var soap = require('soap');
 var mandrill = require('mandrill-api/mandrill');
 var mandrill_client = new mandrill.Mandrill('OUkg9XvLhLHqv9M51lOrAA');
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.get('/', function(req, res){
 	res.send('yummieapi');
