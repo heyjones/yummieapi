@@ -76,7 +76,7 @@ console.log(data);
 	req.on('error', function(e){
 		console.log(e)
 	});
-	req.write(data);
+/* 	req.write(data); */
 	req.end();
 });
 
