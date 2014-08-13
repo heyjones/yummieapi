@@ -6,6 +6,7 @@ var shopifyAPI = require('shopify-node-api');
 var soap = require('soap');
 var mandrill = require('mandrill-api/mandrill');
 var mandrill_client = new mandrill.Mandrill('OUkg9XvLhLHqv9M51lOrAA');
+var CronJob = require('cron').CronJob;
 
 app.use(bodyParser.json());
 
@@ -13,8 +14,90 @@ app.get('/', function(req, res){
 	res.send('howdy');
 });
 
-/* CREATE NICHE ORDER, CREATE SHOPIFY FULFILLMENT */
+/* CREATE / UPDATE SHOPIFY PRODUCTS */
+new CronJob('1 * * * * *', function(){
 
+	soap.createClient('http://dev8.nicheweb.com.au/feed.asmx?wsdl', function(err, client){
+		client.Feed.FeedSoap.StyleFeed(function(err, result){
+			for(var Style in result.StyleFeedResult.Style){
+				/* CREATE / UPDATE SHOPIFY PRODUCT */
+
+				variants = [];
+
+				grams = result.StyleFeedResult.Style[Style].Weight;
+				price =  result.StyleFeedResult.Style[Style].WebPriceLocalUnitPriceExTax1;
+
+				client.Feed.FeedSoap.ProductFeedForStyle({styleCode: result.StyleFeedResult.Style[Style].Code}, function(err, result){
+					for(var Product in result.ProductFeedForStyleResult.Product){
+
+						variant = new Object();
+	
+						variant.barcode = 'BARCODE';
+						variant.grams = grams;
+						variant.inventory_quantity = result.ProductFeedForStyleResult.Product[Product].AvailableStock;
+						variant.old_inventory_quantity = result.ProductFeedForStyleResult.Product[Product].AvailableStock;
+						variant.option1 = result.ProductFeedForStyleResult.Product[Product].Color;
+						variant.option2 = result.ProductFeedForStyleResult.Product[Product].Size;
+						variant.price = price;
+						variant.requires_shipping = true;
+						variant.taxable = true;
+						variant.title = result.ProductFeedForStyleResult.Product[Product].Color +' - '+ result.ProductFeedForStyleResult.Product[Product].Size;
+						variants.push(variant);
+
+					}
+				});
+				var Shopify = new shopifyAPI({
+					shop: 'seedcms.myshopify.com',
+					shopify_api_key: '89fa1ac4b082c6877427bd553b4f64a1',
+					shopify_shared_secret: 'efced55c08389299d01b9fba89e6f303',
+					access_token: 'f4eaa7a2a3da1a3c6d5d808b3737d0b1',
+					verbose: false
+				});
+				var product = {
+					'product': {
+						'title': result.StyleFeedResult.Style[Style].Description,
+						'body_html': result.StyleFeedResult.Style[Style].WebDescription,
+						'vendor': result.StyleFeedResult.Style[Style].Label.Description,
+						'product_type': result.StyleFeedResult.Style[Style].Category,
+						'metafields': [
+							{
+								'key': 'EntityID',
+								'value': result.StyleFeedResult.Style[Style].EntityID,
+								'value_type': 'string',
+								'namespace': 'seedcms'
+							}
+						],
+						'images': [
+							{
+								'src': result.StyleFeedResult.Style[Style].WebMainPicture.ZoomBoxUrl
+							}
+						],
+						'variants': variants
+					}
+				}
+console.log(product);
+/*
+				Shopify.post('/admin/products.json', product, function(err, data, headers){
+console.log(data);
+				});
+				client.Feed.FeedSoap.ProductFeedForStyle({styleCode: result.StyleFeedResult.Style[Style].Code}, function(err, result){
+					/* CREATE / UPDATE SHOPIFY VARIANT */
+/*
+					for(var Product in result.ProductFeedForStyleResult.Product){
+console.log(result.ProductFeedForStyleResult.Product[Product]);
+					}
+				});
+*/
+
+			}
+		});
+	});
+
+}, null, true, 'America/Los_Angeles');
+
+/* CREATE NICHE ORDER, CREATE SHOPIFY FULFILLMENT */
+new CronJob('1 * * * * *', function(){
+}, null, true, 'America/Los_Angeles');
 
 /* CREATE NICHE ORDER, CREATE SHOPIFY FULFILLMENT */
 app.post('/shopify/order/new', function(req, res){
@@ -134,6 +217,19 @@ app.get('/niche/styles.json', function(req, res){
 				styles.push(result.StyleFeedResult.Style[style]);
 			}
 			res.send(styles);
+		});
+	});
+});
+app.get('/niche/styles/:id/products.json', function(req, res){
+	var style = req.params.id;
+console.log(style);
+	var products = [];
+	soap.createClient('http://dev8.nicheweb.com.au/feed.asmx?wsdl', function(err, client){
+		client.Feed.FeedSoap.ProductFeedForStyle({styleCode: style}, function(err, result){
+			for(var product in result.ProductFeedForStyleResult.Product){
+				products.push(result.ProductFeedForStyleResult.Product[product]);
+			}
+			res.send(products);
 		});
 	});
 });
