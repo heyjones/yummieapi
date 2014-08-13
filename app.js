@@ -16,13 +16,14 @@ app.get('/', function(req, res){
 app.post('/shopify/order/new', function(req, res){
 /* console.log(req.body.id); */
 	var Products = new Array();
+	var i;
 	for(line_item in req.body.line_items){
+console.log(line_item);
 		var Product = new Object();
 		Product.barcode = line_item.sku;
 		Product.qty = line_item.quantity;
 		Products.push(Product);
 	}
-	console.log(Products);
 	res.send('done');
 });
 
