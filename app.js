@@ -18,7 +18,7 @@ app.post('/shopify/order/new', function(req, res){
 	var Products = new Array();
 	var i;
 	for(line_item in req.body.line_items){
-console.log(line_item);
+console.log(req.body.line_items[line_item]);
 		var Product = new Object();
 		Product.barcode = line_item.sku;
 		Product.qty = line_item.quantity;
