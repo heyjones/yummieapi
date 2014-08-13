@@ -10,7 +10,7 @@ var mandrill_client = new mandrill.Mandrill('OUkg9XvLhLHqv9M51lOrAA');
 app.use(bodyParser.json());
 
 app.get('/', function(req, res){
-	res.send('yummieapi');
+	res.send('howdy');
 });
 
 app.post('/shopify/order/new', function(req, res){
@@ -130,7 +130,7 @@ console.log(data);
 	res.send('done');
 });
 
-app.get('/yummie/styles.json', function(req, res){
+app.get('/niche/styles.json', function(req, res){
 	var styles = [];
 	soap.createClient('http://dev8.nicheweb.com.au/feed.asmx?wsdl', function(err, client){
 		client.Feed.FeedSoap.StyleFeed(function(err, result){
@@ -150,7 +150,7 @@ app.get('/yummie/styles.json', function(req, res){
 	});
 });
 
-app.get('/yummie/login', function(req, res){
+app.get('/niche/login', function(req, res){
 
 	var login = new Object();
 	login.userName = 'staff';
@@ -190,7 +190,7 @@ console.log(data);
 
 });
 
-app.get('/yummie/order/new', function(req, res){
+app.get('/niche/order/new', function(req, res){
 
 /* 	LOGIN */
 
@@ -284,7 +284,7 @@ app.get('/yummie/order/new', function(req, res){
 	
 });
 
-app.get('/yummie/order/:id', function(req, res){
+app.get('/niche/order/:id', function(req, res){
 
 	var Order = new Object();
 	Order.orderNo = req.params.id;
