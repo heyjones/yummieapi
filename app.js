@@ -14,9 +14,7 @@ app.get('/', function(req, res){
 });
 
 app.post('/shopify/order/new', function(req, res){
-
 	var orderNo = 0;
-
 	var Products = new Array();
 	for(line_item in req.body.line_items){
 		var Product = new Object();
@@ -24,7 +22,6 @@ app.post('/shopify/order/new', function(req, res){
 		Product.qty = req.body.line_items[line_item].quantity;
 		Products.push(Product);
 	}
-
 	var Person = new Object();
 	Person.firstName = req.body.customer.first_name;
 	Person.lastName = req.body.customer.last_name;
@@ -36,12 +33,10 @@ app.post('/shopify/order/new', function(req, res){
 	Person.phone = req.body.shipping_address.phone;
 	Person.optInMailingList = req.body.buyer_accepts_marketing;
 	Person.countryCodeISO3166_A2 = req.body.customer.country_code;
-
 	var Order = new Object();
 	Order.products = Products;
 	Order.person = Person;
 	Order.refNo = req.body.id;
-
 	var data = JSON.stringify({order: Order});
 	var headers = {
 		'Content-Type': 'application/json',
@@ -61,29 +56,21 @@ app.post('/shopify/order/new', function(req, res){
 		});
 		r.on('end', function(){
 console.log(orderNo);
-/*
-			res.send(orderNo);
-			var message = {
-				"from_email": "mandrill@heyjones.com",
-				"from_name": "Mandrill",
-				"headers": {
-					"Reply-To": "mandrill@heyjones.com"
-				},
-				"to": [{
-					"email": "chris@heyjones.com",
-					"name": "Chris Jones",
-					"type": "to"
-				}],
-				"subject": "Order # " + orderNo,
-				"html": "<p>This is a test email from Mandrill</p>",
-				"text": "This is a test email from Mandrill"
-			};
-			mandrill_client.messages.send({"message": message}, function(result){
-				console.log(result);
-			}, function(e){
-				console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+			var Shopify = new shopifyAPI({
+				shop: 'seedcms.myshopify.com',
+				shopify_api_key: '89fa1ac4b082c6877427bd553b4f64a1',
+				shopify_shared_secret: 'efced55c08389299d01b9fba89e6f303',
+				access_token: 'f4eaa7a2a3da1a3c6d5d808b3737d0b1',
+				verbose: false
 			});
-*/
+			var fulfillment = {
+				'fulfillment': {
+					'status': 'pending'
+				}
+			}
+			Shopify.post('/admin/orders/'+req.body.id+'/fulfillments.json', fulfillment, function(err, data, headers){
+console.log(data);
+			});
 		});
 	});
 	req.on('error', function(e){
@@ -91,9 +78,6 @@ console.log(orderNo);
 	});
 	req.write(data);
 	req.end();
-
-/* 	res.send('done'); */
-
 });
 
 app.get('/shopify/orders.json', function(req, res){
