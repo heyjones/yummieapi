@@ -16,8 +16,8 @@ app.get('/', function(req, res){
 
 /* CREATE ORDER */
 app.post('/shopify/order/new', function(req, res){
-
-console.log(req.body.id);
+	var order = JSON.parse(req.body);
+	console.log(order.id);
 /*
 	var message = {
 		'from_email': 'mandrill@heyjones.com',
