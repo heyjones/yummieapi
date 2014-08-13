@@ -13,6 +13,10 @@ app.get('/', function(req, res){
 	res.send('howdy');
 });
 
+/* CREATE NICHE ORDER, CREATE SHOPIFY FULFILLMENT */
+
+
+/* CREATE NICHE ORDER, CREATE SHOPIFY FULFILLMENT */
 app.post('/shopify/order/new', function(req, res){
 	var orderNo = 0;
 	var Products = new Array();
