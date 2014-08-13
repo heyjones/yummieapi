@@ -18,12 +18,12 @@ app.post('/shopify/order/new', function(req, res){
 	var Products = new Array();
 	var i;
 	for(line_item in req.body.line_items){
-console.log(req.body.line_items[line_item]);
 		var Product = new Object();
-		Product.barcode = line_item.sku;
-		Product.qty = line_item.quantity;
+		Product.barcode = req.body.line_items[line_item].sku;
+		Product.qty = req.body.line_items[line_item].quantity;
 		Products.push(Product);
 	}
+console.log(Products);
 	res.send('done');
 });
 
