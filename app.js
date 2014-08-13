@@ -14,29 +14,16 @@ app.get('/', function(req, res){
 });
 
 app.post('/shopify/order/new', function(req, res){
-console.log(req.body.id);
-/*
-	var message = {
-		'from_email': 'mandrill@heyjones.com',
-		'from_name': 'Mandrill',
-		'headers': {
-			'Reply-To': 'mandrill@heyjones.com'
-		},
-		'to': [{
-			'email': 'chris@heyjones.com',
-			'name': 'Chris Jones',
-			'type': 'to'
-		}],
-		'subject': 'New Order',
-		'html': JSON.stringify(req.body),
-		'text': JSON.stringify(req.body)
-	};
-	mandrill_client.messages.send({'message': message}, function(result){
-	}, function(e){
-		console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-	});
-*/
-	res.send(JSON.stringify(req.body));
+/* console.log(req.body.id); */
+	var Products = new Array();
+	for(line_item in req.body.line_items){
+		var Product = new Object();
+		Product.barcode = line_item.sku;
+		Product.qty = line_item.quantity;
+		Products.push(Product);
+	}
+	console.log(Products);
+	res.send('done');
 });
 
 app.get('/shopify/orders.json', function(req, res){
