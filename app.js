@@ -9,12 +9,16 @@ var mandrill_client = new mandrill.Mandrill('OUkg9XvLhLHqv9M51lOrAA');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
+/* INDEX */
 app.get('/', function(req, res){
 	res.send('yummieapi');
 });
 
+/* CREATE ORDER */
 app.post('/shopify/order/new', function(req, res){
-console.log(req.body);
+
+console.log(req.body.id);
+/*
 	var message = {
 		'from_email': 'mandrill@heyjones.com',
 		'from_name': 'Mandrill',
@@ -27,15 +31,16 @@ console.log(req.body);
 			'type': 'to'
 		}],
 		'subject': 'New Order',
-		'html': JSON.stringify(req.body),
-		'text': JSON.stringify(req.body)
+		'html': JSON.stringify(req.body.id),
+		'text': JSON.stringify(req.body.id)
 	};
 	mandrill_client.messages.send({'message': message}, function(result){
-/* 		console.log(result); */
 	}, function(e){
 		console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
 	});
+*/
 	res.send(JSON.stringify(req.body));
+
 });
 
 app.get('/shopify/orders.json', function(req, res){
