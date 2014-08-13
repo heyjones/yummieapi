@@ -60,6 +60,8 @@ app.post('/shopify/order/new', function(req, res){
 			orderNo = data;
 		});
 		r.on('end', function(){
+console.log(orderNo);
+/*
 			res.send(orderNo);
 			var message = {
 				"from_email": "mandrill@heyjones.com",
@@ -81,6 +83,7 @@ app.post('/shopify/order/new', function(req, res){
 			}, function(e){
 				console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
 			});
+*/
 		});
 	});
 	req.on('error', function(e){
@@ -89,7 +92,7 @@ app.post('/shopify/order/new', function(req, res){
 	req.write(data);
 	req.end();
 
-	res.send('done');
+/* 	res.send('done'); */
 
 });
 
