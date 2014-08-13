@@ -16,7 +16,7 @@ app.get('/', function(req, res){
 
 /* CREATE ORDER */
 app.post('/shopify/order/new', function(req, res){
-	var order = JSON.parse(req.body);
+	var order = JSON.parse(req);
 	console.log(order.id);
 /*
 	var message = {
