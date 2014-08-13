@@ -14,7 +14,8 @@ app.get('/', function(req, res){
 });
 
 app.post('/shopify/order/new', function(req, res){
-console.log(req.body);
+console.log(req.body.id);
+/*
 	var message = {
 		'from_email': 'mandrill@heyjones.com',
 		'from_name': 'Mandrill',
@@ -31,10 +32,10 @@ console.log(req.body);
 		'text': JSON.stringify(req.body)
 	};
 	mandrill_client.messages.send({'message': message}, function(result){
-/* 		console.log(result); */
 	}, function(e){
 		console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
 	});
+*/
 	res.send(JSON.stringify(req.body));
 });
 
