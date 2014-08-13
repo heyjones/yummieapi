@@ -61,6 +61,26 @@ app.post('/shopify/order/new', function(req, res){
 		});
 		r.on('end', function(){
 			res.send(orderNo);
+			var message = {
+				"from_email": "mandrill@heyjones.com",
+				"from_name": "Mandrill",
+				"headers": {
+					"Reply-To": "mandrill@heyjones.com"
+				},
+				"to": [{
+					"email": "chris@heyjones.com",
+					"name": "Chris Jones",
+					"type": "to"
+				}],
+				"subject": "Order # " + orderNo,
+				"html": "<p>This is a test email from Mandrill</p>",
+				"text": "This is a test email from Mandrill"
+			};
+			mandrill_client.messages.send({"message": message}, function(result){
+				console.log(result);
+			}, function(e){
+				console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+			});
 		});
 	});
 	req.on('error', function(e){
@@ -69,7 +89,7 @@ app.post('/shopify/order/new', function(req, res){
 	req.write(data);
 	req.end();
 
-	res.send(orderNo);
+	res.send('done');
 
 });
 
