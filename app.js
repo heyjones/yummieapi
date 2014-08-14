@@ -7,6 +7,7 @@ var soap = require('soap');
 var mandrill = require('mandrill-api/mandrill');
 var mandrill_client = new mandrill.Mandrill('OUkg9XvLhLHqv9M51lOrAA');
 var CronJob = require('cron').CronJob;
+var async = require('async');
 
 app.use(bodyParser.json());
 
@@ -15,36 +16,101 @@ app.get('/', function(req, res){
 });
 
 /* CREATE / UPDATE SHOPIFY PRODUCTS */
+
+function nicheAPI(callback){
+	soap.createClient('http://dev8.nicheweb.com.au/feed.asmx?wsdl', function nicheAPI(err, client){
+		callback(client);
+	});
+}
+
+function nicheStyles(client, callback){
+	client.Feed.FeedSoap.StyleFeed(function(err, result){
+		var styles = [];
+		for(var style in result.StyleFeedResult.Style){
+			styles.push(result.StyleFeedResult.Style[style]);
+		}
+		callback(styles);
+	});
+}
+
+function nicheProducts(client, style, callback){
+	client.Feed.FeedSoap.ProductFeedForStyle({styleCode: style.Code}, function(err, result){
+		var products = [];
+		for(var product in result.ProductFeedForStyleResult.Product){
+			products.push(result.ProductFeedForStyleResult.Product[product]);
+		}
+		callback(products);
+	});
+}
+
 new CronJob('1 * * * * *', function(){
 
-	soap.createClient('http://dev8.nicheweb.com.au/feed.asmx?wsdl', function(err, client){
+	nicheAPI(function(client){
+		nicheStyles(client, function(styles){
+			for(style in styles){
+				console.log(styles[style]);
+				nicheProducts(client, styles[style], function(products){
+					console.log(products);
+				});
+			}
+		});
+	});
+/*
 		client.Feed.FeedSoap.StyleFeed(function(err, result){
-			for(var Style in result.StyleFeedResult.Style){
-				/* CREATE / UPDATE SHOPIFY PRODUCT */
+				for(var style in result.StyleFeedResult.Style){
 
-				variants = [];
+			async.each(, function(style, callback){
+				console.log(style);
+				client.Feed.FeedSoap.ProductFeedForStyle({styleCode: style.Code}, function nicheStyleProducts(err, result){
+					async.map(result.ProductFeedForStyleResult.Product, function nicheProduct(Product, callback){
+						console.log(Product);
+					});
+				});
+			});
+	});
 
-				grams = result.StyleFeedResult.Style[Style].Weight;
-				price =  result.StyleFeedResult.Style[Style].WebPriceLocalUnitPriceExTax1;
 
-				client.Feed.FeedSoap.ProductFeedForStyle({styleCode: result.StyleFeedResult.Style[Style].Code}, function(err, result){
-					for(var Product in result.ProductFeedForStyleResult.Product){
+			async.eachSeries(result.StyleFeedResult.Style, function(Style, callback){
 
-						variant = new Object();
-	
+				console.log(Style);
+
+				var variants = [];
+				var price =  Style.WebPrice.LocalUnitPriceExTax1;
+console.log(price);
+				client.Feed.FeedSoap.ProductFeedForStyle({styleCode: Style.Code}, function(err, result){
+					async.eachSeries(result.ProductFeedForStyleResult.Product, function(Product, callback){
+						var variant = new Object();
 						variant.barcode = 'BARCODE';
-						variant.grams = grams;
-						variant.inventory_quantity = result.ProductFeedForStyleResult.Product[Product].AvailableStock;
-						variant.old_inventory_quantity = result.ProductFeedForStyleResult.Product[Product].AvailableStock;
-						variant.option1 = result.ProductFeedForStyleResult.Product[Product].Color;
-						variant.option2 = result.ProductFeedForStyleResult.Product[Product].Size;
+						variant.grams = Product.Weight;
+						variant.inventory_quantity = Product.AvailableStock;
+						variant.old_inventory_quantity = Product.AvailableStock;
+						variant.option1 = Product.Color;
+						variant.option2 = Product.Size;
 						variant.price = price;
 						variant.requires_shipping = true;
 						variant.taxable = true;
-						variant.title = result.ProductFeedForStyleResult.Product[Product].Color +' - '+ result.ProductFeedForStyleResult.Product[Product].Size;
+						variant.title = Product.Color +' - '+ Product.Size;
 						variants.push(variant);
-
-					}
+console.log(variant);
+						callback();
+					});
+				});
+				callback();
+			});
+					async.eachSeries(result.ProductFeedForStyleResult.Product, function(Product, callback){
+						variant = new Object();
+						variant.barcode = 'BARCODE';
+						variant.grams = grams;
+						variant.inventory_quantity = Product.AvailableStock;
+						variant.old_inventory_quantity = Product.AvailableStock;
+						variant.option1 = Product.Color;
+						variant.option2 = Product.Size;
+						variant.price = price;
+						variant.requires_shipping = true;
+						variant.taxable = true;
+						variant.title = Product.Color +' - '+ Product.Size;
+						variants.push(variant);
+					});
 				});
 				var Shopify = new shopifyAPI({
 					shop: 'seedcms.myshopify.com',
@@ -55,27 +121,27 @@ new CronJob('1 * * * * *', function(){
 				});
 				var product = {
 					'product': {
-						'title': result.StyleFeedResult.Style[Style].Description,
-						'body_html': result.StyleFeedResult.Style[Style].WebDescription,
-						'vendor': result.StyleFeedResult.Style[Style].Label.Description,
-						'product_type': result.StyleFeedResult.Style[Style].Category,
+						'title': Style.Description,
+						'body_html': Style.WebDescription,
+						'vendor': Style.Label.Description,
+						'product_type': Style.Category,
 						'metafields': [
 							{
 								'key': 'EntityID',
-								'value': result.StyleFeedResult.Style[Style].EntityID,
+								'value': Style.EntityID,
 								'value_type': 'string',
 								'namespace': 'seedcms'
 							}
 						],
 						'images': [
 							{
-								'src': result.StyleFeedResult.Style[Style].WebMainPicture.ZoomBoxUrl
+								'src': Style.WebMainPicture.ZoomBoxUrl
 							}
 						],
 						'variants': variants
 					}
 				}
-console.log(product);
+*/
 /*
 				Shopify.post('/admin/products.json', product, function(err, data, headers){
 console.log(data);
@@ -87,12 +153,12 @@ console.log(data);
 console.log(result.ProductFeedForStyleResult.Product[Product]);
 					}
 				});
-*/
 
-			}
+			});
 		});
 	});
 
+*/
 }, null, true, 'America/Los_Angeles');
 
 /* CREATE NICHE ORDER, CREATE SHOPIFY FULFILLMENT */
